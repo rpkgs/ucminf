@@ -40,7 +40,9 @@ ucminf(par, fn, gr = NULL, \dots, control = list(), hessian=0)
       \item{2}{Returns final approximation of the inverse Hessian based on the series of BFGS
 	updates during optimization. }
       \item{3}{Same at 2, but will also return the Hessian (the inverse of 2). }
-      }
+    }
+    If a \code{TRUE} or \code{FALSE} value is given it will switch
+  between option 1 or 0.
   }
 }
 
@@ -51,12 +53,26 @@ ucminf(par, fn, gr = NULL, \dots, control = list(), hessian=0)
   Fortran subroutine \code{MINF} and the Matlab function
   \code{fminunc}.
 
+  The interface in R is designed so that it is very easy to switch
+  between using \code{ucminf} and \code{optim}. The 
+  arguments \sQuote{par}, \sQuote{fn}, \sQuote{gr}, and \sQuote{hessian}
+  are all the same (with a few extra options for \sQuote{hessian} in
+  \code{ucminf}). The difference is that there is no \sQuote{method} 
+  argument in \code{ucminf} and that some of the components in the
+  \sQuote{control} argument are different due to differences in the
+  algorithms. 
+
   The algorithm can be given an initial estimate of the Hessian for the
   optimization and it is possible to get the final approximation of the
   Hessian based on the series of BFGS updates. This extra functionality
   may be useful for optimization in a series of related problems.
+
+  The functions \sQuote{fn} and \sQuote{gr} can return \code{Inf} or \code{NaN}
+  if the functions cannot be evaluated at the supplied value, but the
+  functions must be computable at the initial value. Note, the functions
+  are not allowed to return \code{NA}.
   
-  The 'control' argument is a list that can supply any of the
+  The \sQuote{control} argument is a list that can supply any of the
   following components:
   
   \describe{
@@ -66,37 +82,41 @@ ucminf(par, fn, gr = NULL, \dots, control = list(), hessian=0)
       The algorithm stops when
       \eqn{||F'(x)||_\infty \leq }{||F'(x)||_inf <=} grtol, that
       is when the largest absolute value of the gradient is less than
-      grtol. Default value is grtol = 1e-6. }
+      grtol. Default value is \code{grtol = 1e-6}. }
     \item{xtol}{
       The algorithm stops when \eqn{||x-x_p||_2 \leq
 	\textrm{xtol}\cdot(\textrm{xtol} + 
       ||x||_2)}{||x-x_p||_2 <=
-	xtol*(xtol + ||x||_2)}, that is when the last step is
-      sufficiently small. Default value is xtol = 1e-12.}
+	xtol*(xtol + ||x||_2)}, where \eqn{x_p} and \eqn{x} are the
+      previous and current estimate of the minimizer. Thus the algorithm
+      stops when the last relative step length is
+      sufficiently small. Default value is \code{xtol = 1e-12}.}
     \item{stepmax}{
       Initial maximal allowed step length (radius of
       trust-region). The value is updated during the
-      optimization. Default value is stepmax = 1.}
+      optimization. Default value is \code{stepmax = 1}.}
     \item{maxeval}{
       The maximum number of function evaluations. A function evaluation
       is counted as one evaluation of the objective function and of the
-      gradient function. Default value is maxeval = 500.  } 
+      gradient function. Default value is \code{maxeval = 500}.  } 
     \item{grad}{
       Either \sQuote{forward} or \sQuote{central}. Controls
       the type of finite difference approximation to be used for the
       gradient if no gradient function is given in the input argument
-      \sQuote{gr}. Default value is grad = 'forward'.}
+      \sQuote{gr}. Default value is \code{grad = 'forward'}.}
     \item{gradstep}{
       Vector of length 2. The step length in finite
       difference approximation for the gradient. Step length is
       \eqn{|x_i|\cdot\textrm{gradstep[1]+gradstep[2]}}{|x_i|*gradstep[1]+gradstep[2]}.
-      The default value is gradstep = c( 1e-6, 1e-8 ).  } 
+      Default value is \code{gradstep = c( 1e-6, 1e-8 )}.  } 
     \item{invhessian.lt}{
       A vector with an initial approximation to the lower triangle of the
       inverse Hessian. If not given, the inverse Hessian is initialized
-      as the identity matrix. }
+      as the identity matrix. If \code{H0} is the initial hessian matrix then
+      the lower triangle of the inverse of \code{H0} can be found as
+      \code{invhessian.lt = solve(H0)[lower.tri(H0,diag=TRUE)]}.}
     \item{method.args}{
-      Used when \sQuote{hessian = 1}. Arguments for
+      Used when \code{hessian = 1}. Arguments for
       hessian approximation using the \sQuote{numDeriv} package, see
       \code{\link[numDeriv]{hessian}} for more details.}
   }
@@ -116,7 +136,6 @@ ucminf(par, fn, gr = NULL, \dots, control = list(), hessian=0)
       \item{-5}{Computation did not start: grtol or xtol <= 0.}
       \item{-6}{Computation did not start: maxeval <= 0.}
       \item{-7}{Computation did not start: given Hessian not pos. definite.}
-      \item{-8}{Computation did not start: iw too small.}
     }
   }
   \item{message}{String with reason of termination.}
