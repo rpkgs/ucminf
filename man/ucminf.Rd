@@ -1,12 +1,15 @@
 \name{ucminf}
 \alias{ucminf}
 
-\title{UCMINF - An algorithm for unconstrained non-linear optimization}
-
+\title{General-purpose unconstrained non-linear optimization}
+\concept{minimization}
+\concept{maximization}
 \description{
-  The algorithm is of quasi-Newton type with BFGS updating of the inverse
+  An algorithm for general-purpose unconstrained non-linear optimization. The algorithm
+  is of quasi-Newton type with BFGS updating of the inverse
   Hessian and soft line search with a trust region type monitoring of the
-  input to the line search algorithm.
+  input to the line search algorithm. The interface of \sQuote{ucminf} is designed for
+  easy interchange with \sQuote{optim}.
 }
 
 \usage{
@@ -16,13 +19,13 @@ ucminf(par, fn, gr = NULL, \dots, control = list(), hessian=0)
 
 \arguments{    
   \item{par}{
-    Initial estimate of minimum for \sQuote{fn}.
+    Initial estimate of minimum for \code{fn}.
   }
   \item{fn}{
     Objective function to be minimized.
   }
   \item{gr}{
-    Gradient of objective function. If NULL a finite difference
+    Gradient of objective function. If \code{NULL} a finite difference
     approximation is used.
   }
   \item{\dots}{
@@ -47,19 +50,19 @@ ucminf(par, fn, gr = NULL, \dots, control = list(), hessian=0)
 }
 
 \details{
-  The implementation of UCMINF is based on the original Fortran source
-  code. The algorithm is documented in (Nielsen, 2000) (see References
-  below) with a description of the algorithm and a comparison to the
-  Fortran subroutine \code{MINF} and the Matlab function
-  \code{fminunc}.
+  The algorithm is documented in (Nielsen, 2000) (see References
+  below) together with a comparison to the Fortran subroutine
+  \sQuote{MINF} and the Matlab function \sQuote{fminunc}. The
+  implementation of \sQuote{ucminf} in \R uses the 
+  original Fortran version of the algorithm. 
 
   The interface in R is designed so that it is very easy to switch
-  between using \code{ucminf} and \code{optim}. The 
-  arguments \sQuote{par}, \sQuote{fn}, \sQuote{gr}, and \sQuote{hessian}
-  are all the same (with a few extra options for \sQuote{hessian} in
-  \code{ucminf}). The difference is that there is no \sQuote{method} 
-  argument in \code{ucminf} and that some of the components in the
-  \sQuote{control} argument are different due to differences in the
+  between using \sQuote{ucminf} and \sQuote{\link[stats]{optim}}. The 
+  arguments \code{par}, \code{fn}, \code{gr}, and \code{hessian}
+  are all the same (with a few extra options for \code{hessian} in
+  \sQuote{ucminf}). The difference is that there is no \code{method} 
+  argument in \sQuote{ucminf} and that some of the components in the
+  \code{control} argument are different due to differences in the
   algorithms. 
 
   The algorithm can be given an initial estimate of the Hessian for the
@@ -67,23 +70,23 @@ ucminf(par, fn, gr = NULL, \dots, control = list(), hessian=0)
   Hessian based on the series of BFGS updates. This extra functionality
   may be useful for optimization in a series of related problems.
 
-  The functions \sQuote{fn} and \sQuote{gr} can return \code{Inf} or \code{NaN}
+  The functions \code{fn} and \code{gr} can return \code{Inf} or \code{NaN}
   if the functions cannot be evaluated at the supplied value, but the
   functions must be computable at the initial value. Note, the functions
   are not allowed to return \code{NA}.
   
-  The \sQuote{control} argument is a list that can supply any of the
+  The \code{control} argument is a list that can supply any of the
   following components:
   
   \describe{
-    \item{trace}{
-      If trace is positive then tracing information is printed for each iteration.}
-    \item{grtol}{
+    \item{\code{trace}}{
+      If trace is positive then detailed tracing information is printed for each iteration.}
+    \item{\code{grtol}}{
       The algorithm stops when
       \eqn{||F'(x)||_\infty \leq }{||F'(x)||_inf <=} grtol, that
       is when the largest absolute value of the gradient is less than
       grtol. Default value is \code{grtol = 1e-6}. }
-    \item{xtol}{
+    \item{\code{xtol}}{
       The algorithm stops when \eqn{||x-x_p||_2 \leq
 	\textrm{xtol}\cdot(\textrm{xtol} + 
       ||x||_2)}{||x-x_p||_2 <=
@@ -91,34 +94,34 @@ ucminf(par, fn, gr = NULL, \dots, control = list(), hessian=0)
       previous and current estimate of the minimizer. Thus the algorithm
       stops when the last relative step length is
       sufficiently small. Default value is \code{xtol = 1e-12}.}
-    \item{stepmax}{
+    \item{\code{stepmax}}{
       Initial maximal allowed step length (radius of
       trust-region). The value is updated during the
       optimization. Default value is \code{stepmax = 1}.}
-    \item{maxeval}{
+    \item{\code{maxeval}}{
       The maximum number of function evaluations. A function evaluation
       is counted as one evaluation of the objective function and of the
       gradient function. Default value is \code{maxeval = 500}.  } 
-    \item{grad}{
+    \item{\code{grad}}{
       Either \sQuote{forward} or \sQuote{central}. Controls
       the type of finite difference approximation to be used for the
       gradient if no gradient function is given in the input argument
       \sQuote{gr}. Default value is \code{grad = 'forward'}.}
-    \item{gradstep}{
+    \item{\code{gradstep}}{
       Vector of length 2. The step length in finite
       difference approximation for the gradient. Step length is
       \eqn{|x_i|\cdot\textrm{gradstep[1]+gradstep[2]}}{|x_i|*gradstep[1]+gradstep[2]}.
-      Default value is \code{gradstep = c( 1e-6, 1e-8 )}.  } 
-    \item{invhessian.lt}{
+      Default value is \code{gradstep = c(1e-6, 1e-8)}.  } 
+    \item{\code{invhessian.lt}}{
       A vector with an initial approximation to the lower triangle of the
       inverse Hessian. If not given, the inverse Hessian is initialized
       as the identity matrix. If \code{H0} is the initial hessian matrix then
       the lower triangle of the inverse of \code{H0} can be found as
       \code{invhessian.lt = solve(H0)[lower.tri(H0,diag=TRUE)]}.}
-    \item{method.args}{
+    \item{\code{method.args}}{
       Used when \code{hessian = 1}. Arguments for
       hessian approximation using the \sQuote{numDeriv} package, see
-      \code{\link[numDeriv]{hessian}} for more details.}
+      \sQuote{\link[numDeriv]{hessian}} in \sQuote{numDeriv} for more details.}
   }
 }
 
@@ -170,12 +173,12 @@ ucminf(par, fn, gr = NULL, \dots, control = list(), hessian=0)
   Nielsen, H. B. (2000) \sQuote{UCMINF - An Algorithm For Unconstrained,
   Nonlinear Optimization}, Report IMM-REP-2000-18,
   Department of Mathematical Modelling, Technical University of
-  Denmark. \url{http://www2.imm.dtu.dk/~hbn/publ/TR0019.ps}
+  Denmark. \url{http://www2.imm.dtu.dk/~hbn/publ/TR0019.ps} or \url{http://orbit.dtu.dk/recid/200975}.
 
   The original Fortran
   source code can be found at
   \url{http://www2.imm.dtu.dk/~hbn/Software/ucminf.f}. The code has been
-  slightly modified in this package to be suitable for use with R.
+  slightly modified in this package to be suitable for use with \R.
 
   The general structure of the implementation in \R is based on the
   package \sQuote{FortranCallsR} by Diethelm Wuertz. 
@@ -221,4 +224,5 @@ ucminf(par = c(20.5,20.0), fn = fQ, gr = gQ,
 }
 
 \keyword{optimize}
+\keyword{nonlinear}
 
