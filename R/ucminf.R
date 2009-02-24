@@ -74,6 +74,10 @@ ucminf = function(par, fn, gr = NULL, ..., control = list(), hessian=0) {
                   neval       = get(".maxfun", envir = rho)
                 )
   }
+  if(trace) {
+    cat(paste(ans$message,'\n'))
+    print(ans$info)
+  }
   nm <- names(par)
   if (!is.null(nm)) 
     names(ans$par) <- nm
