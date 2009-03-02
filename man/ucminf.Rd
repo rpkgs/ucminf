@@ -118,10 +118,6 @@ ucminf(par, fn, gr = NULL, \dots, control = list(), hessian=0)
       as the identity matrix. If \code{H0} is the initial hessian matrix then
       the lower triangle of the inverse of \code{H0} can be found as
       \code{invhessian.lt = solve(H0)[lower.tri(H0,diag=TRUE)]}.}
-    \item{\code{method.args}}{
-      Used when \code{hessian = 1}. Arguments for
-      hessian approximation using the \sQuote{numDeriv} package, see
-      \sQuote{\link[numDeriv]{hessian}} in \sQuote{numDeriv} for more details.}
   }
 }
 

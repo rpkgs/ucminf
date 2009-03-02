@@ -1,7 +1,6 @@
 ucminf = function(par, fn, gr = NULL, ..., control = list(), hessian=0) {
   con <- list(trace=0, grtol=1e-6, xtol=1e-12, stepmax=1, maxeval=500,
-              grad='forward',gradstep=c(1e-6,1e-8), invhessian.lt = NULL, 
-              method.args = NULL)
+              grad='forward',gradstep=c(1e-6,1e-8), invhessian.lt = NULL)
   stopifnot(names(control) %in% names(con))
   con[(namc <- names(control))] <- control
   stopifnot(length(con$gradstep)==2,con$grad %in% c('forward','central'))
@@ -56,8 +55,7 @@ ucminf = function(par, fn, gr = NULL, ..., control = list(), hessian=0) {
     )
   if(0<icontr) {
     if(hessian == 1) 
-      ans$hessian <- hessian(fn, ans$par, method="Richardson",
-                             method.args=con$method.args, ...)
+      ans$hessian <- hessian(fn, ans$par, method = "Richardson", ...)
     if(hessian == 2 | hessian == 3) {
       logicMat <- (matrix(-(1:n^2),n,n,byrow=TRUE)+matrix(1:n^2,n,n))<=0
       COV <- matrix(0,n,n)
@@ -79,7 +77,10 @@ ucminf = function(par, fn, gr = NULL, ..., control = list(), hessian=0) {
     print(ans$info)
   }
   nm <- names(par)
-  if (!is.null(nm)) 
+  if (!is.null(nm)) {
     names(ans$par) <- nm
+    if(!is.null(ans$hessian))
+      colnames(ans$hessian) <- rownames(ans$hessian) <- nm
+  }
   ans
 }
