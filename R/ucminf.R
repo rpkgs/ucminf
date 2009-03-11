@@ -20,8 +20,10 @@ ucminf = function(par, fn, gr = NULL, ..., control = list(), hessian=0) {
   par0 <- rep(0,n)
   for(i in 1:n) #avoid that par from calling env. is overwritten
     par0[i] = par[i]
+  xname <- as.double(rep(0,n))
+  names(xname) <- names(par)
   assign(".n",      as.integer(n)           , envir = rho) 
-  assign(".x",      as.double(rep(0,n))     , envir = rho)
+  assign(".x",      xname                   , envir = rho)
   assign(".par",    as.double(par0)         , envir = rho)
   assign(".stepmax",as.double(con$stepmax)  , envir = rho)
   assign(".eps",    as.double(eps)          , envir = rho)
@@ -54,8 +56,11 @@ ucminf = function(par, fn, gr = NULL, ..., control = list(), hessian=0) {
       )
     )
   if(0<icontr) {
-    if(hessian == 1) 
-      ans$hessian <- hessian(fn, ans$par, method = "Richardson", ...)
+    if(hessian == 1) {
+      p0 <- ans$par
+      names(p0) <- names(par)
+      ans$hessian <- hessian(fn, p0, method = "Richardson", ...)
+    }
     if(hessian == 2 | hessian == 3) {
       logicMat <- (matrix(-(1:n^2),n,n,byrow=TRUE)+matrix(1:n^2,n,n))<=0
       COV <- matrix(0,n,n)

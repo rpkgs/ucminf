@@ -72,8 +72,10 @@ ucminf(par, fn, gr = NULL, \dots, control = list(), hessian=0)
 
   The functions \code{fn} and \code{gr} can return \code{Inf} or \code{NaN}
   if the functions cannot be evaluated at the supplied value, but the
-  functions must be computable at the initial value. Note, the functions
-  are not allowed to return \code{NA}.
+  functions must be computable at the initial value. The functions
+  are not allowed to return \code{NA}. Any names given to \code{par} will be
+  copied to the vectors passed to \code{fn} and \code{gr}. No
+  other attributes of \code{par} are copied over.
   
   The \code{control} argument is a list that can supply any of the
   following components:
