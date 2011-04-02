@@ -17,7 +17,7 @@ ucminf(par, fn, gr = NULL, \dots, control = list(), hessian=0)
 }
 
 
-\arguments{    
+\arguments{
   \item{par}{
     Initial estimate of minimum for \code{fn}.
   }
@@ -30,7 +30,7 @@ ucminf(par, fn, gr = NULL, \dots, control = list(), hessian=0)
   }
   \item{\dots}{
     Optional arguments passed to the objective and gradient functions.
-  }        
+  }
   \item{control}{
     A list of control parameters. See \sQuote{Details}.
   }
@@ -53,17 +53,17 @@ ucminf(par, fn, gr = NULL, \dots, control = list(), hessian=0)
   The algorithm is documented in (Nielsen, 2000) (see References
   below) together with a comparison to the Fortran subroutine
   \sQuote{MINF} and the Matlab function \sQuote{fminunc}. The
-  implementation of \sQuote{ucminf} in \R uses the 
-  original Fortran version of the algorithm. 
+  implementation of \sQuote{ucminf} in \R uses the
+  original Fortran version of the algorithm.
 
   The interface in R is designed so that it is very easy to switch
-  between using \sQuote{ucminf} and \sQuote{\link[stats]{optim}}. The 
+  between using \sQuote{ucminf} and \sQuote{\link[stats]{optim}}. The
   arguments \code{par}, \code{fn}, \code{gr}, and \code{hessian}
   are all the same (with a few extra options for \code{hessian} in
-  \sQuote{ucminf}). The difference is that there is no \code{method} 
+  \sQuote{ucminf}). The difference is that there is no \code{method}
   argument in \sQuote{ucminf} and that some of the components in the
   \code{control} argument are different due to differences in the
-  algorithms. 
+  algorithms.
 
   The algorithm can be given an initial estimate of the Hessian for the
   optimization and it is possible to get the final approximation of the
@@ -76,10 +76,10 @@ ucminf(par, fn, gr = NULL, \dots, control = list(), hessian=0)
   are not allowed to return \code{NA}. Any names given to \code{par} will be
   copied to the vectors passed to \code{fn} and \code{gr}. No
   other attributes of \code{par} are copied over.
-  
+
   The \code{control} argument is a list that can supply any of the
   following components:
-  
+
   \describe{
     \item{\code{trace}}{
       If trace is positive then detailed tracing information is printed for each iteration.}
@@ -90,7 +90,7 @@ ucminf(par, fn, gr = NULL, \dots, control = list(), hessian=0)
       grtol. Default value is \code{grtol = 1e-6}. }
     \item{\code{xtol}}{
       The algorithm stops when \eqn{||x-x_p||_2 \leq
-	\textrm{xtol}\cdot(\textrm{xtol} + 
+	\textrm{xtol}\cdot(\textrm{xtol} +
       ||x||_2)}{||x-x_p||_2 <=
 	xtol*(xtol + ||x||_2)}, where \eqn{x_p} and \eqn{x} are the
       previous and current estimate of the minimizer. Thus the algorithm
@@ -103,7 +103,7 @@ ucminf(par, fn, gr = NULL, \dots, control = list(), hessian=0)
     \item{\code{maxeval}}{
       The maximum number of function evaluations. A function evaluation
       is counted as one evaluation of the objective function and of the
-      gradient function. Default value is \code{maxeval = 500}.  } 
+      gradient function. Default value is \code{maxeval = 500}.  }
     \item{\code{grad}}{
       Either \sQuote{forward} or \sQuote{central}. Controls
       the type of finite difference approximation to be used for the
@@ -113,7 +113,7 @@ ucminf(par, fn, gr = NULL, \dots, control = list(), hessian=0)
       Vector of length 2. The step length in finite
       difference approximation for the gradient. Step length is
       \eqn{|x_i|\cdot\textrm{gradstep[1]+gradstep[2]}}{|x_i|*gradstep[1]+gradstep[2]}.
-      Default value is \code{gradstep = c(1e-6, 1e-8)}.  } 
+      Default value is \code{gradstep = c(1e-6, 1e-8)}.  }
     \item{\code{invhessian.lt}}{
       A vector with an initial approximation to the lower triangle of the
       inverse Hessian. If not given, the inverse Hessian is initialized
@@ -147,7 +147,7 @@ ucminf(par, fn, gr = NULL, \dots, control = list(), hessian=0)
   \item{info}{Information about the search:
     \describe{
       \item{maxgradient}{\eqn{||F'(x)||_\infty}{||F'(x)||_inf}, the
-	largest element in the absolute 
+	largest element in the absolute
 	value of the gradient at the computed minimizer.}
       \item{laststep}{Length of last step.}
       \item{stepmax}{Final maximal allowed step length.}
@@ -160,8 +160,11 @@ ucminf(par, fn, gr = NULL, \dots, control = list(), hessian=0)
 
   \sQuote{UCMINF} algorithm design and Fortran code by Hans Bruun Nielsen.
 
-  Implementation in \R by Stig B. Mortensen, \email{sbm@imm.dtu.dk}.
-    
+  Implementation in \R by Stig B. Mortensen, \email{stigbm@gmail.com}.
+
+  Modifications by Douglas Bates <bates@stat.wisc.edu>, Nov. 2010, to
+  support nested optimization and correct issues with printing on Windows.
+
 }
 
 \seealso{\code{\link[stats]{optim}}, \code{\link[stats]{nlminb}}, \code{\link[stats]{nlm}}.}
@@ -179,8 +182,8 @@ ucminf(par, fn, gr = NULL, \dots, control = list(), hessian=0)
   slightly modified in this package to be suitable for use with \R.
 
   The general structure of the implementation in \R is based on the
-  package \sQuote{FortranCallsR} by Diethelm Wuertz. 
-  
+  package \sQuote{FortranCallsR} by Diethelm Wuertz.
+
 }
 
 
@@ -197,28 +200,6 @@ ucminf(par = c(2,.5), fn = fR, gr=gR)
 #  Compare hessian approximations
 ucminf(par = c(2,.5), fn = fR, gr=gR, hessian=1)$hessian
 ucminf(par = c(2,.5), fn = fR, gr=gR, hessian=3)$hessian
-
-#  Compare run times with optim's BFGS method
-#  (chosen convergence criteria result in similar accuracy)
-system.time( for(i in 1:500)
-               ucminf(par = c(2,0.5), fn = fR, gr=gR)
-           )
-system.time( for(i in 1:500)
-               optim(par = c(2,0.5), fn = fR, gr=gR,method='BFGS')
-           )
-
-
-## Quadratic function
-fQ = function(x) { sum((4*x-1)^2) }
-gQ = function(x) { 32*x -8}
-
-#  Find minimum with too small stepmax and print trace
-ucminf(par = c(20.5,20.0), fn = fQ, gr = gQ, 
-       control=list(stepmax=1,trace=TRUE))
-
-#  The same again with a larger stepmax
-ucminf(par = c(20.5,20.0), fn = fQ, gr = gQ,
-       control=list(stepmax=100,trace=TRUE))
 }
 
 \keyword{optimize}

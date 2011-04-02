@@ -22,6 +22,8 @@ ucminf = function(par, fn, gr = NULL, ..., control = list(), hessian=0) {
     par0[i] = par[i]
   xname <- as.double(rep(0,n))
   names(xname) <- names(par)
+  assign(".f",      fnstr                   , envir = rho)
+  assign(".gr",     grstr                   , envir = rho)
   assign(".n",      as.integer(n)           , envir = rho) 
   assign(".x",      xname                   , envir = rho)
   assign(".par",    as.double(par0)         , envir = rho)
@@ -34,7 +36,7 @@ ucminf = function(par, fn, gr = NULL, ..., control = list(), hessian=0) {
   assign(".grad",   as.integer(grad)        , envir = rho)
   assign(".grstep", as.double(con$gradstep) , envir = rho)
   #
-  .Call("mfopt", fnstr, grstr, rho, PACKAGE = "ucminf")
+  .Call("mfopt", rho, PACKAGE = "ucminf")
   #
   W <- get(".w", envir = rho)
   icontr <- get(".icontr", envir = rho)

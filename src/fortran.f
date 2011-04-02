@@ -1,4 +1,4 @@
-      SUBROUTINE UCMINF(N,X,DX,EPS,MAXFUN,W,IW,ICONTR,GRAD,GRSTEP)
+      SUBROUTINE UCMINF(N,X,DX,EPS,MAXFUN,W,IW,ICONTR,GRAD,GRSTEP,RHO)
 ************************************************************************
 * Unconstrained minimization of a scalar function.
 *
@@ -21,10 +21,10 @@
       IMPLICIT          NONE
 C  Parameters
 C     EXTERNAL          FDF
-      INTEGER           N, MAXFUN, IW, ICONTR, GRAD
+      INTEGER           N, MAXFUN, IW, ICONTR, GRAD, RHO(*)
       DOUBLE PRECISION  X(N), DX, EPS(2), W(IW), GRSTEP(2)
 C  Local variables
-      LOGICAL           DGIVN, OPTIM, REDU, TRACE, USEDEL, RTRACE
+      LOGICAL           DGIVN, OPTIM, REDU, TRACE, USEDEL
       INTEGER           DI,DN,FAIL,GN,GP,HN,I,II,INDX(3),
      &                  MEVAL,NEVAL,NN,NN1,WN
       DOUBLE PRECISION  A,FX,FXN,NMG,NMH,NMX,SL(2),THRX,YH,YV
@@ -36,20 +36,11 @@ C  BLAS functions
 C If BLAS is available, then remove the * in col. 1 of the next lines
 C and delete from line ??? to the end of the file
       EXTERNAL          DCOPY, DDOT, DNRM2, DSCAL, DSPMV, DSPR2, IDAMAX
-C
-C Preparation for printing i R terminal:
-      CHARACTER         OUT*80
-      EXTERNAL          DBLEPR
-
-C     OUT = 6
-
 
 C       ... What job ?
         OPTIM = (ICONTR .GT. 0)
         DGIVN = (ICONTR .GT. 2)
         TRACE = ((ICONTR .EQ. 2) .OR. (ICONTR .GT. 3))
-C       ... Set printing in R
-        RTRACE = TRACE
 C       ... Simple checks
         ICONTR = 0
         NN = (N * (N+1)) / 2
@@ -76,7 +67,7 @@ C
 C         ... Check gradient
           GN = 5
           HN = GN + N
-          CALL CHKDFN(N,X,DX,W,INDX,W(GN),W(HN),FAIL,GRAD,GRSTEP)
+          CALL CHKDFN(N,X,DX,W,INDX,W(GN),W(HN),FAIL,GRAD,GRSTEP,RHO)
           IF  (FAIL .GT. 0)  THEN
 C           ... DX is too small
             ICONTR = -4
@@ -122,7 +113,7 @@ C         ... Initialize inverse Hessian to unit matrix
           USEDEL = .TRUE.
         ENDIF
 C       ... First call of FDF
-        CALL FDF(N,X,W(GN),FX,GRAD,GRSTEP)
+        CALL FDF(N,X,W(GN),FX,GRAD,GRSTEP,RHO)
         NEVAL = 1
         NMH = 0D0
         NMX = DNRM2(N, X,1)
@@ -135,10 +126,11 @@ C
 C       ... Repeat from here
  100    CONTINUE
         IF  (TRACE)  THEN
-          WRITE(OUT,'(A,I3,2(2X,A,1P1D11.3))') 'neval =',NEVAL,
-     +      'F(x) =',FX, 'max|g(x)| =',NMG
-          CALL DBLEPR (OUT, -1, X, 0)
-          CALL PRVCTR('  x',X,1,N,OUT)
+           CALL PRTRAC(NEVAL, FX, NMG, N, X)
+c$$$          WRITE(OUT,'(A,I3,2(2X,A,1P1D11.3))') 'neval =',NEVAL,
+c$$$     +      'F(x) =',FX, 'max|g(x)| =',NMG
+c$$$          CALL DBLEPR (OUT, -1, X, 0)
+c$$$          CALL PRVCTR('  x',X,1,N,OUT)
         ENDIF
 C
 C       ... Copy current x and gradient and get new step
@@ -160,12 +152,14 @@ C       ... Adjust step length to trust region
         ENDIF
 C       ... Line search (MEVAL is max iterations in line search)
         MEVAL = 5
-        CALL SLINE(N,X,FX,W(GN),W(HN),W(WN),A,FXN,SL,MEVAL,GRAD,GRSTEP)
+        CALL SLINE(N,X,FX,W(GN),W(HN),W(WN),A,FXN,SL,MEVAL,
+     &             GRAD,GRSTEP,RHO)
         IF  (TRACE)  THEN
-          WRITE(OUT,'(A,1P1D11.3,2(2X,A,1P1D11.3))')
-     +      'Line search: alpha =',
-     +      A, 'dphi(0) =',SL(1),'dphi(alpha) =',SL(2)
-          CALL DBLEPR (OUT, -1, X, 0)
+           CALL PRLINE(A, SL)
+c$$$          WRITE(OUT,'(A,1P1D11.3,2(2X,A,1P1D11.3))')
+c$$$     +      'Line search: alpha =',
+c$$$     +      A, 'dphi(0) =',SL(1),'dphi(alpha) =',SL(2)
+c$$$          CALL DBLEPR (OUT, -1, X, 0)
         ENDIF
         IF  (A .EQ. 0D0)  THEN
           ICONTR = 4
@@ -216,18 +210,20 @@ C       ... Set return values
         W(3) = NMH
         IF  (TRACE)  THEN
            IF(ICONTR.EQ.1.OR.ICONTR.EQ.2.OR.ICONTR.EQ.4) THEN
-              WRITE(OUT,'(A)') 'Optimization has converged.'
+c$$$              WRITE(OUT,'(A)') 'Optimization has converged.'
+              CALL PRCONV()
            ELSE
-              WRITE(OUT,'(A27,I3,A22)') 'Optimization stopped after '
-     +             ,NEVAL,' function evaluations.'
+c$$$              WRITE(OUT,'(A27,I3,A22)') 'Optimization stopped after '
+c$$$     +             ,NEVAL,' function evaluations.'
+              CALL PRFAIL(NEVAL)
            ENDIF
-           CALL DBLEPR (OUT, -1, X, 0)
+c$$$           CALL DBLEPR (OUT, -1, X, 0)
         ENDIF
         RETURN
 ***************************  End of  UCMINF  ***************************
       END
 C
-      SUBROUTINE SLINE(N,X,F,G,H,W,ALPHA,FN,SLOPES,NEVAL,GRAD,GRSTEP)
+      SUBROUTINE SLINE(N,X,F,G,H,W,ALPHA,FN,SLPS,NEV,GRAD,GRSTEP,RHO)
 ************************************************************************
 * Soft line search
 * Hans Bruun Nielsen, IMM, DTU.  00.12.18
@@ -235,8 +231,8 @@ C
       IMPLICIT          NONE
 C  Parameters
 C      EXTERNAL          FDF
-      INTEGER           N, NEVAL, GRAD
-      DOUBLE PRECISION  X(N),F,G(N),H(N),W(*),ALPHA,FN,SLOPES(2),XTMP(N)
+      INTEGER           N, NEV, GRAD, RHO(*)
+      DOUBLE PRECISION  X(N),F,G(N),H(N),W(*),ALPHA,FN,SLPS(2)
       DOUBLE PRECISION  GRSTEP(2)      
 C  Local variables
       LOGICAL           OK,STOP
@@ -252,24 +248,24 @@ C
 C       ... Default return values
         ALPHA = 0D0
         FN = F
-        MEVAL = NEVAL
-        NEVAL = 0
+        MEVAL = NEV
+        NEV = 0
 C       ... Get initial slope and check descent direction
-        SLOPES(1) = DDOT(N, G,1, H,1)
-        SLOPES(2) = SLOPES(1)
-        IF  (SLOPES(1) .GE. 0D0)  RETURN
+        SLPS(1) = DDOT(N, G,1, H,1)
+        SLPS(2) = SLPS(1)
+        IF  (SLPS(1) .GE. 0D0)  RETURN
 C       ... Split work space and finish initialization
         NX = 1
         NG = N + 1
         FI0 = F
-        SL0 = 5D-2 * SLOPES(1)
-        SLTHR = .995D0 * SLOPES(1)
+        SL0 = 5D-2 * SLPS(1)
+        SLTHR = .995D0 * SLPS(1)
         OK = .FALSE.
         STOP = .FALSE.
         XFD(1,1) = 0D0
         XFD(2,1) = F
-        XFD(3,1) = SLOPES(1)
-        NEVAL = 0
+        XFD(3,1) = SLPS(1)
+        NEV = 0
         B = 1D0
   10    CONTINUE
 C       ... Evaluate at  x + b*h
@@ -279,20 +275,20 @@ C       ... Evaluate at  x + b*h
 
 c        XTMP=X
 c        WRITE(6,'(A,2F8.3)') 'X1a =',X
-        CALL FDF(N,W,W(NG),XFD(2,2),GRAD,GRSTEP)
+        CALL FDF(N,W,W(NG),XFD(2,2),GRAD,GRSTEP,RHO)
 c        WRITE(6,'(A,2F8.3)') 'X1b =',X
 c        X=XTMP
 c        WRITE(6,'(A,2F8.3)') 'X1c =',X
-        NEVAL = NEVAL + 1
+        NEV = NEV + 1
         XFD(3,2) = DDOT(N, W(NG),1, H,1)
-        IF  (B .EQ. 1D0)  SLOPES(2) = XFD(3,2)
+        IF  (B .EQ. 1D0)  SLPS(2) = XFD(3,2)
         IF  (XFD(2,2) .LE. FI0 + SL0*XFD(1,2))  THEN
 C         ... New lower bound
           IF  (XFD(3,2) .LE. ABS(SLTHR))  THEN
             OK = .TRUE.
             ALPHA = XFD(1,2)
             FN = XFD(2,2)
-            SLOPES(2) = XFD(3,2)
+            SLPS(2) = XFD(3,2)
             CALL DCOPY(N, W(NG),1, G,1)
             IF  ((B .LT. 2D0) .AND. (XFD(3,2) .LT. SLTHR))  THEN
 C             ... Expand
@@ -305,7 +301,7 @@ C             ... Expand
 C
         D = XFD(1,2) - XFD(1,1)
 C
-  20    IF  (OK .OR. (NEVAL .EQ. MEVAL))  RETURN
+  20    IF  (OK .OR. (NEV .EQ. MEVAL))  RETURN
 C
 C       ... Refine interval.  Min of quadratic interpolator
         C = XFD(2,2) - XFD(2,1) - D*XFD(3,1)
@@ -321,17 +317,17 @@ C         ... Minimizer in interval
         CALL DAXPY(N, XFD(1,3), H,1, W,1)
 c        XTMP=X
 c        WRITE(6,'(A,2F8.3)') 'X2a =',X
-        CALL FDF(N,W,W(NG),XFD(2,3),GRAD,GRSTEP)
+        CALL FDF(N,W,W(NG),XFD(2,3),GRAD,GRSTEP,RHO)
 c        WRITE(6,'(A,2F8.3)') 'X2b =',X
 c        X=XTMP
-        NEVAL = NEVAL + 1
+        NEV = NEV + 1
         XFD(3,3) = DDOT(N, W(NG),1, H,1)
         IF  (XFD(2,3) .LT. FI0 + SL0*XFD(1,3))  THEN
 C         ... New lower bound
           OK = .TRUE.
           ALPHA = XFD(1,3)
           FN = XFD(2,3)
-          SLOPES(2) = XFD(3,3)
+          SLPS(2) = XFD(3,3)
           CALL DCOPY(N, W(NG),1, G,1)
           CALL DCOPY(3, XFD(1,3),1, XFD(1,1),1)
         ELSE
@@ -390,13 +386,13 @@ C           ... Compute k'th column and update trailing submatrix
 ***************************  End of  SPCHOL  ***************************
       END
 C
-      SUBROUTINE CHKDFN(N,X,STEPL,DIFF,INDX,G,G1,FAIL,GRAD,GRSTEP)
+      SUBROUTINE CHKDFN(N,X,STEPL,DIFF,INDX,G,G1,FAIL,GRAD,GRSTEP,RHO)
 ************************************************************************
 * Check implementation of gradient of function of N variables
 * Hans Bruun Nielsen, IMM, DTU.  00.09.29
 ************************************************************************
       IMPLICIT          NONE
-      INTEGER           N,INDX(3),FAIL, I,GRAD
+      INTEGER           N,INDX(3),FAIL, I,GRAD, RHO(*)
       DOUBLE PRECISION  X(N),STEPL,DIFF(4),G(N),G1(N),
      &                  F,F1, XI,H,AF,AB,AE,ER, GRSTEP(2)
 C      EXTERNAL          FDF
@@ -407,7 +403,7 @@ C       ... Initialize
   10      DIFF(I) = 0D0
         DO  20  I = 1, 3
   20      INDX(I) = 0
-        CALL FDF(N,X,G,F,GRAD,GRSTEP)
+        CALL FDF(N,X,G,F,GRAD,GRSTEP,RHO)
 C       ... Run through components of X
         DO  30  I = 1, N
           DIFF(1) = MAX(DIFF(1), ABS(G(I)))
@@ -416,7 +412,7 @@ C         ... Forward
           X(I) = XI + STEPL
           H = X(I) - XI
           IF  (H .EQ. 0D0)  RETURN
-          CALL FDF(N,X,G1,F1,GRAD,GRSTEP)
+          CALL FDF(N,X,G1,F1,GRAD,GRSTEP,RHO)
           AF = (F1 - F)/H
           ER = AF - G(I)
           IF  (ABS(ER) .GT. ABS(DIFF(2)))  THEN
@@ -427,7 +423,7 @@ C         ... Back
           X(I) = XI - .5D0 * STEPL
           H = X(I) - XI
           IF  (H .EQ. 0D0)  RETURN
-          CALL FDF(N,X,G1,F1,GRAD,GRSTEP)
+          CALL FDF(N,X,G1,F1,GRAD,GRSTEP,RHO)
           AB = (F1 - F)/H
           ER = AB - G(I)
           IF  (ABS(ER) .GT. ABS(DIFF(3)))  THEN
@@ -448,68 +444,68 @@ C         ... Restore x(i)
         RETURN
 **************************  end of CHKDFN   ****************************
        END
-
-      SUBROUTINE PRVCTR(NAME,X,I1,I2,UNT)
-************************************************************************
-*  Print on UNT elements  I1 to I2  of  X  with name  NAME
-*  Hans Bruun Nielsen, Numerisk Institut, DTH.  89.09.28.
-************************************************************************
-*  Modified for printing in R. Stig B. Mortensen, Dec. 2008.
-************************************************************************
-
-      IMPLICIT NONE
-      CHARACTER*3      NAME
-      INTEGER          I1,I2,J,J1,J2
-      DOUBLE PRECISION X(*)
-      CHARACTER        UNT*80
-      EXTERNAL         DBLEPR
-C
-        J2 = I1 - 1
-  10    IF  (J2 .GE. I2)  RETURN
-        J1 = J2 + 1
-        J2 = J2 + 5
-        IF  (J2 .GT. I2)  J2 = I2
-        WRITE(UNT,'(1X,A,A,I3,A,I3,A,T18,1P1D10.3,1P4D12.3)')
-     /        NAME,'(',J1,'..',J2,') =',(X(J), J=J1,J2)
-        CALL DBLEPR (UNT, -1, X(1), 0)         
-        GOTO 10
-**************************  end of  PRVCTR  ****************************
-      END
-
+c$$$
+c$$$      SUBROUTINE PRVCTR(NAME,X,I1,I2,UNT)
+c$$$************************************************************************
+c$$$*  Print on UNT elements  I1 to I2  of  X  with name  NAME
+c$$$*  Hans Bruun Nielsen, Numerisk Institut, DTH.  89.09.28.
+c$$$************************************************************************
+c$$$*  Modified for printing in R. Stig B. Mortensen, Dec. 2008.
+c$$$************************************************************************
+c$$$
+c$$$      IMPLICIT NONE
+c$$$      CHARACTER*3      NAME
+c$$$      INTEGER          I1,I2,J,J1,J2
+c$$$      DOUBLE PRECISION X(*)
+c$$$      CHARACTER        UNT*80
+c$$$      EXTERNAL         DBLEPR
+c$$$C
+c$$$        J2 = I1 - 1
+c$$$  10    IF  (J2 .GE. I2)  RETURN
+c$$$        J1 = J2 + 1
+c$$$        J2 = J2 + 5
+c$$$        IF  (J2 .GT. I2)  J2 = I2
+c$$$        WRITE(UNT,'(1X,A,A,I3,A,I3,A,T18,1P1D10.3,1P4D12.3)')
+c$$$     /        NAME,'(',J1,'..',J2,') =',(X(J), J=J1,J2)
+c$$$        CALL DBLEPR (UNT, -1, X(1), 0)         
+c$$$        GOTO 10
+c$$$**************************  end of  PRVCTR  ****************************
+c$$$      END
+c$$$
 
 
 c ------------------------------------------------------------------------------
-      SUBROUTINE FDF(N, X, G, F , GRAD,GRSTEP)
+      SUBROUTINE FDF(N, X, G, F, GRAD, GRSTEP, RHO)
       IMPLICIT NONE
-      INTEGER N,I,J, GRAD
-      DOUBLE PRECISION X(N), G(N), F, DX, X2(N), F2, F3, GRSTEP(2)
-      CALL FUNC( N,X,F)
+      INTEGER N, GRAD, RHO(*)
+      DOUBLE PRECISION X(N), G(N), F, GRSTEP(2)
+      CALL FUNC(N, X, F, RHO)
       IF(GRAD==0) THEN
-         CALL USRGR(N,X,G)
+         CALL USRGR(N, X, G, RHO)
       ELSE
-         CALL GR( N,X,F,G, GRAD,GRSTEP)
+         CALL GR(N, X, F, G, GRAD, GRSTEP, RHO)
       ENDIF
       END
         
 
 c ------------------------------------------------------------------------------
-      SUBROUTINE FUNC(N, X, VALUE)
-      IMPLICIT NONE
-      INTEGER N
-      DOUBLE PRECISION X(N), VALUE
-      CALL CFUNC(N, X, VALUE)
-      END      
+c$$$      SUBROUTINE FUNC(N, X, VALUE)
+c$$$      IMPLICIT NONE
+c$$$      INTEGER N
+c$$$      DOUBLE PRECISION X(N), VALUE
+c$$$      CALL CFUNC(N, X, VALUE)
+c$$$      END      
+c$$$
+c$$$      SUBROUTINE USRGR(N, X, G)
+c$$$      IMPLICIT NONE
+c$$$      INTEGER N
+c$$$      DOUBLE PRECISION X(N), G(N)
+c$$$      CALL CGRAD(N, X, G)
+c$$$      END      
 
-      SUBROUTINE USRGR(N, X, G)
+      SUBROUTINE GR(N, X, F, G, GRAD, GRSTEP, RHO)
       IMPLICIT NONE
-      INTEGER N
-      DOUBLE PRECISION X(N), G(N)
-      CALL CGRAD(N, X, G)
-      END      
-
-      SUBROUTINE GR(N, X, F , G, GRAD,GRSTEP)
-      IMPLICIT NONE
-      INTEGER N,I,J, GRAD
+      INTEGER N,I,J, GRAD, RHO(*)
       LOGICAL FWDIFF
       DOUBLE PRECISION X(N), G(N), F, DX, X2(N), F2, F3, GRSTEP(2)
       INTRINSIC ABS
@@ -521,12 +517,12 @@ c ------------------------------------------------------------------------------
          ENDDO
          DX = ABS(X2(I)) * GRSTEP(1) + GRSTEP(2)
          X2(I) = X2(I) + DX
-         CALL FUNC( N,X2,F2)
+         CALL FUNC(N, X2, F2, RHO)
          IF(FWDIFF) THEN
             G(I) = (F2-F)/DX
          ELSE
             X2(I) = X2(I) - 2*DX
-            CALL FUNC( N,X2,F3)
+            CALL FUNC(N, X2, F3, RHO)
             G(I) = (F2-F3)/(2*DX)
          ENDIF
       ENDDO
