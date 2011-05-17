@@ -1,6 +1,6 @@
 Package: ucminf
-Version: 1.1-0
-Date: 2011-04-02
+Version: 1.1-1
+Date: 2011-05-17
 Title: General-purpose unconstrained non-linear optimization
 Author: Hans Bruun Nielsen and Stig Bousgaard Mortensen
 Maintainer: Stig Bousgaard Mortensen <stigbm@gmail.com>
@@ -12,6 +12,6 @@ Description: An algorithm for general-purpose unconstrained non-linear
         interchange with 'optim'.
 Depends: numDeriv, R (>= 1.9.0)
 License: GPL (>= 2)
-Packaged: 2011-04-02 10:11:58 UTC; sbm
+Packaged: 2011-05-17 23:00:01 UTC; sbm
 Repository: CRAN
-Date/Publication: 2011-04-03 07:43:42
+Date/Publication: 2011-05-18 04:54:36

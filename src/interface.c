@@ -2,10 +2,10 @@
   Stig Bousgaard Mortensen
   DTU Informatics
   sbm@imm.dtu.dk
-  
+
   Based on R-package 'FortranCallsR' by
   Diethelm Wuertz, ETH Zurich, www.rmetrics.org
-  
+
   Modifications by Douglas Bates <bates@stat.wisc.edu>, Nov. 2010
 */
 
@@ -17,7 +17,7 @@
 // Declare FORTRAN routine for use in C
 extern void F77_NAME(ucminf)(int*, double[], double*, double[],
 			     int*,double[],int*,int*,int*,double[],SEXP);
-			    
+
 /*-------------------------------------------------------------------------------
   Define C functions that calls user defined function in R
 */
@@ -31,12 +31,12 @@ void installPar(int nn, double x[], SEXP rho) {
     for (i = 0; i < nn; i++) xpt[i] = x[i] ;
 }
 
-void F77_SUB(func)(int *n, double x[], double *value, SEXP rho) { 
+void F77_SUB(func)(int *n, double x[], double *value, SEXP rho) {
     installPar(*n, x, rho);
     *value = asReal(eval(findVarInFrame(rho, install(".f")), rho)) ;
 }
 
-void F77_SUB(usrgr)(int *n, double x[], double grval[], SEXP rho) { 
+void F77_SUB(usrgr)(int *n, double x[], double grval[], SEXP rho) {
     SEXP OUT;
     int i, nn = *n;
     double *grv;
@@ -54,18 +54,17 @@ void F77_SUB(usrgr)(int *n, double x[], double grval[], SEXP rho) {
   Define C function to be called from R
 */
 
-SEXP mfopt(SEXP rho) {  
+SEXP mfopt(SEXP rho) {
     int n      = asInteger(findVarInFrame(rho, install(     ".n"))),
-	maxfun = asInteger(findVarInFrame(rho, install(".maxfun"))),
 	iw     = asInteger(findVarInFrame(rho, install(    ".iw"))),
-	icontr = asInteger(findVarInFrame(rho, install(".icontr"))),
 	grad   = asInteger(findVarInFrame(rho, install(  ".grad")));
-    double
-	dx     = asReal(findVarInFrame(rho, install(".stepmax")));
     SEXP
 	EPS    = findVarInFrame(rho, install(   ".eps")),
 	GRSTEP = findVarInFrame(rho, install(".grstep")),
 	PAR    = findVarInFrame(rho, install(   ".par")),
+	icontr = findVarInFrame(rho, install(".icontr")),
+	maxfun = findVarInFrame(rho, install(".maxfun")),
+	dx     = findVarInFrame(rho, install(".stepmax")),
 	W      = findVarInFrame(rho, install(     ".w"));
 
     if (LENGTH(EPS) < 2 || !isReal(EPS))
@@ -76,9 +75,9 @@ SEXP mfopt(SEXP rho) {
 	error("Dimension mismatch, length(.par) = %d != n = $d", LENGTH(PAR), n);
     if (LENGTH(W) != iw || !isReal(W))
 	error("Dimension mismatch, length(.w) = %d != .iw = $d", LENGTH(W), iw);
-   
+
 				//  Call the FORTRAN routine 'ucminf'
-    F77_CALL(ucminf)(&n, REAL(PAR), &dx, REAL(EPS), &maxfun, REAL(W), &iw, &icontr, 
+    F77_CALL(ucminf)(&n, REAL(PAR), REAL(dx), REAL(EPS), INTEGER(maxfun), REAL(W), &iw, INTEGER(icontr),
 		     &grad, REAL(GRSTEP), rho) ;
     return R_NilValue;
 }
