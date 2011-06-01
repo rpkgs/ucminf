@@ -4,12 +4,12 @@ ucminf = function(par, fn, gr = NULL, ..., control = list(), hessian=0) {
   stopifnot(names(control) %in% names(con))
   con[(namc <- names(control))] <- control
   stopifnot(length(con$gradstep)==2,con$grad %in% c('forward','central'))
-  fnstr <- quote(fn(.x, ...))	
-  grstr <- quote(gr(.x, ...))	
+  fnstr <- quote(fn(.x, ...))
+  grstr <- quote(gr(.x, ...))
   rho = new.env(parent = environment())
   n <- length(par)
   eps <- c(con$grtol,con$xtol)
-  if(!is.null(gr)) { grad <- 0 } 
+  if(!is.null(gr)) { grad <- 0 }
   else { grad <- ifelse(con$grad=='forward',1,2) } #else central
   iw <- n*ceiling(max(n+1,(n+11)/2)) + 10
   w <- rep(0,iw)
@@ -24,7 +24,7 @@ ucminf = function(par, fn, gr = NULL, ..., control = list(), hessian=0) {
   names(xname) <- names(par)
   assign(".f",      fnstr                   , envir = rho)
   assign(".gr",     grstr                   , envir = rho)
-  assign(".n",      as.integer(n)           , envir = rho) 
+  assign(".n",      as.integer(n)           , envir = rho)
   assign(".x",      xname                   , envir = rho)
   assign(".par",    as.double(par0)         , envir = rho)
   assign(".stepmax",as.double(con$stepmax)  , envir = rho)
@@ -41,7 +41,7 @@ ucminf = function(par, fn, gr = NULL, ..., control = list(), hessian=0) {
   W <- get(".w", envir = rho)
   icontr <- get(".icontr", envir = rho)
   ans = list(
-    par = get(".par", envir = rho), 
+    par = get(".par", envir = rho),
     value = W[1],
     convergence = icontr,
     message = switch(as.character(icontr),
@@ -59,9 +59,13 @@ ucminf = function(par, fn, gr = NULL, ..., control = list(), hessian=0) {
     )
   if(0<icontr) {
     if(hessian == 1) {
-      p0 <- ans$par
-      names(p0) <- names(par)
-      ans$hessian <- hessian(fn, p0, method = "Richardson", ...)
+      if(suppressPackageStartupMessages(suppressWarnings(require("numDeriv")))) {
+        p0 <- ans$par
+        names(p0) <- names(par)
+        ans$hessian <- hessian(fn, p0, method = "Richardson", ...)
+      } else {
+        cat("Skipped hessian estimation - package 'numDeriv' must be installed for hessian option 1", sep = "\n")
+      }
     }
     if(hessian == 2 | hessian == 3) {
       logicMat <- (matrix(-(1:n^2),n,n,byrow=TRUE)+matrix(1:n^2,n,n))<=0
@@ -81,7 +85,8 @@ ucminf = function(par, fn, gr = NULL, ..., control = list(), hessian=0) {
   }
   if(trace) {
     cat(paste(ans$message,'\n'))
-    print(ans$info)
+    if(!is.null(ans$info))
+      print(ans$info)
   }
   nm <- names(par)
   if (!is.null(nm)) {

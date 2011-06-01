@@ -191,15 +191,12 @@ ucminf(par, fn, gr = NULL, \dots, control = list(), hessian=0)
 
 \examples{
 ## Rosenbrock Banana function
-fR = function(x) { (1-x[1])^2+100*(x[2]-x[1]^2)^2 }
-gR = function(x) { c( -400*x[1]*(x[2]-x[1]*x[1]) - 2*(1-x[1]),
-                       200*(x[2]-x[1]*x[1])) }
-#  Find minimum
-ucminf(par = c(2,.5), fn = fR, gr=gR)
+fR <- function(x) (1 - x[1])^2 + 100 * (x[2] - x[1]^2)^2
+gR <- function(x) c(-400 * x[1] * (x[2] - x[1] * x[1]) - 2 * (1 - x[1]),
+                     200 * (x[2] - x[1] * x[1]))
 
-#  Compare hessian approximations
-ucminf(par = c(2,.5), fn = fR, gr=gR, hessian=1)$hessian
-ucminf(par = c(2,.5), fn = fR, gr=gR, hessian=3)$hessian
+#  Find minimum and show trace
+ucminf(par = c(2,.5), fn = fR, gr = gR, control = list(trace = 1))
 }
 
 \keyword{optimize}
