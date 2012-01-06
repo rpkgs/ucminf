@@ -1,0 +1,8 @@
+d7e3b30628bcd39f06662c1c1223ebd9 *DESCRIPTION
+cb6f3e788adaeaccc02ae4363f0b39c9 *NAMESPACE
+bf9ac7e4e798d910f6a7e448db80788f *R/ucminf.R
+d312cab8710370f57013100356ebe0af *inst/doc/TR0019.pdf
+b180cb2e20f836b3df051f7d00b0ab68 *man/ucminf.Rd
+3996e7c16bfb96fad295ee425815cb4d *src/Makevars
+1c0df5573f64d62f2d23c1a1ffc08dc9 *src/fortran.f
+76f9951cb4ba63a0c424a777587f9b25 *src/interface.c

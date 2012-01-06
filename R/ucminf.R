@@ -36,7 +36,7 @@ ucminf = function(par, fn, gr = NULL, ..., control = list(), hessian=0) {
   assign(".grad",   as.integer(grad)        , envir = rho)
   assign(".grstep", as.double(con$gradstep) , envir = rho)
   #
-  .Call("mfopt", rho, PACKAGE = "ucminf")
+  .Call(mfopt, rho)
   #
   W <- get(".w", envir = rho)
   icontr <- get(".icontr", envir = rho)
