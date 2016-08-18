@@ -1,7 +1,7 @@
 \name{ucminf}
 \alias{ucminf}
 
-\title{General-purpose unconstrained non-linear optimization}
+\title{General-Purpose Unconstrained Non-Linear Optimization}
 \concept{minimization}
 \concept{maximization}
 \description{
@@ -174,11 +174,11 @@ ucminf(par, fn, gr = NULL, \dots, control = list(), hessian=0)
   Nielsen, H. B. (2000) \sQuote{UCMINF - An Algorithm For Unconstrained,
   Nonlinear Optimization}, Report IMM-REP-2000-18,
   Department of Mathematical Modelling, Technical University of
-  Denmark. \url{http://www2.imm.dtu.dk/~hbn/publ/TR0019.ps} or \url{http://orbit.dtu.dk/recid/200975}.
+  Denmark. \url{http://orbit.dtu.dk/recid/200975}.
 
   The original Fortran
   source code can be found at
-  \url{http://www2.imm.dtu.dk/~hbn/Software/ucminf.f}. The code has been
+  \url{http://www2.imm.dtu.dk/projects/hbn_software/ucminf.f}. The code has been
   slightly modified in this package to be suitable for use with \R.
 
   The general structure of the implementation in \R is based on the

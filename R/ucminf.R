@@ -59,12 +59,12 @@ ucminf = function(par, fn, gr = NULL, ..., control = list(), hessian=0) {
     )
   if(0<icontr) {
     if(hessian == 1) {
-      if(suppressPackageStartupMessages(suppressWarnings(require("numDeriv")))) {
+      if(requireNamespace("numDeriv", quietly = TRUE)) {
         p0 <- ans$par
         names(p0) <- names(par)
-        ans$hessian <- hessian(fn, p0, method = "Richardson", ...)
+        ans$hessian <- numDeriv::hessian(fn, p0, method = "Richardson", ...)
       } else {
-        cat("Skipped hessian estimation - package 'numDeriv' must be installed for hessian option 1", sep = "\n")
+        warning("Skipped hessian estimation - package 'numDeriv' must be installed for hessian option 1")
       }
     }
     if(hessian == 2 | hessian == 3) {

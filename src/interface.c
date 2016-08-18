@@ -7,6 +7,7 @@
   Diethelm Wuertz, ETH Zurich, www.rmetrics.org
 
   Modifications by Douglas Bates <bates@stat.wisc.edu>, Nov. 2010
+  Modifications by Tomas Kalibera <tomas.kalibera@gmail.com> Aug. 2016.
 */
 
 
@@ -75,6 +76,15 @@ SEXP mfopt(SEXP rho) {
 	error("Dimension mismatch, length(.par) = %d != n = $d", LENGTH(PAR), n);
     if (LENGTH(W) != iw || !isReal(W))
 	error("Dimension mismatch, length(.w) = %d != .iw = $d", LENGTH(W), iw);
+
+    // duplicate dx, maxfun, .w because they are input/output arguments
+    maxfun = PROTECT(duplicate(maxfun));
+    defineVar(install(".maxfun"), maxfun, rho);
+    dx = PROTECT(duplicate(dx));
+    defineVar(install(".stepmax"), dx, rho);
+    W = PROTECT(duplicate(W));
+    defineVar(install(".w"), W, rho);
+    UNPROTECT(3); // now protected via rho
 
 				//  Call the FORTRAN routine 'ucminf'
     F77_CALL(ucminf)(&n, REAL(PAR), REAL(dx), REAL(EPS), INTEGER(maxfun), REAL(W), &iw, INTEGER(icontr),
