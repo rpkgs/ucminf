@@ -34,7 +34,10 @@ void installPar(int nn, double x[], SEXP rho) {
 
 void F77_SUB(func)(int *n, double x[], double *value, SEXP rho) {
     installPar(*n, x, rho);
-    *value = asReal(eval(findVarInFrame(rho, install(".f")), rho)) ;
+    SEXP dotf = findVarInFrame(rho, install(".f"));
+    PROTECT(dotf);
+    *value = asReal(PROTECT(eval(dotf, rho))) ;
+    UNPROTECT(2);
 }
 
 void F77_SUB(usrgr)(int *n, double x[], double grval[], SEXP rho) {
@@ -43,12 +46,13 @@ void F77_SUB(usrgr)(int *n, double x[], double grval[], SEXP rho) {
     double *grv;
 
     installPar(nn, x, rho);
-    PROTECT(OUT = eval(findVarInFrame(rho, install(".gr")), rho));
+    SEXP dotgr = PROTECT(findVarInFrame(rho, install(".gr")));
+    PROTECT(OUT = eval(dotgr, rho));
     if (LENGTH(OUT) != nn || !isReal(OUT))
 	error("gradient evaluation must return a numeric vector of length %d", nn);
     grv = REAL(OUT);
     for (i = 0; i < nn; i++) grval[i] = grv[i];
-    UNPROTECT(1) ;
+    UNPROTECT(2) ;
 }
 
 /*--------------------------------------------------------------------------------
@@ -56,17 +60,18 @@ void F77_SUB(usrgr)(int *n, double x[], double grval[], SEXP rho) {
 */
 
 SEXP mfopt(SEXP rho) {
-    int n      = asInteger(findVarInFrame(rho, install(     ".n"))),
-	iw     = asInteger(findVarInFrame(rho, install(    ".iw"))),
-	grad   = asInteger(findVarInFrame(rho, install(  ".grad")));
+    int n      = asInteger(PROTECT(findVarInFrame(rho, install(     ".n")))),
+	iw     = asInteger(PROTECT(findVarInFrame(rho, install(    ".iw")))),
+	grad   = asInteger(PROTECT(findVarInFrame(rho, install(  ".grad"))));
+    UNPROTECT(3);
     SEXP
-	EPS    = findVarInFrame(rho, install(   ".eps")),
-	GRSTEP = findVarInFrame(rho, install(".grstep")),
-	PAR    = findVarInFrame(rho, install(   ".par")),
-	icontr = findVarInFrame(rho, install(".icontr")),
-	maxfun = findVarInFrame(rho, install(".maxfun")),
-	dx     = findVarInFrame(rho, install(".stepmax")),
-	W      = findVarInFrame(rho, install(     ".w"));
+	EPS    = PROTECT(findVarInFrame(rho, install(   ".eps"))),
+	GRSTEP = PROTECT(findVarInFrame(rho, install(".grstep"))),
+	PAR    = PROTECT(findVarInFrame(rho, install(   ".par"))),
+	icontr = PROTECT(findVarInFrame(rho, install(".icontr"))),
+	maxfun = PROTECT(findVarInFrame(rho, install(".maxfun"))),
+	dx     = PROTECT(findVarInFrame(rho, install(".stepmax"))),
+	W      = PROTECT(findVarInFrame(rho, install(     ".w")));
 
     if (LENGTH(EPS) < 2 || !isReal(EPS))
 	error(".eps must be a numeric vector of length >= 2");
@@ -89,6 +94,7 @@ SEXP mfopt(SEXP rho) {
 				//  Call the FORTRAN routine 'ucminf'
     F77_CALL(ucminf)(&n, REAL(PAR), REAL(dx), REAL(EPS), INTEGER(maxfun), REAL(W), &iw, INTEGER(icontr),
 		     &grad, REAL(GRSTEP), rho) ;
+    UNPROTECT(7);
     return R_NilValue;
 }
 
