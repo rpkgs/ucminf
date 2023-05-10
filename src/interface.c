@@ -15,6 +15,8 @@
 #include <Rinternals.h>  //R internal structures
 #include <R_ext/RS.h>    //F77_CALL etc.
 
+#define CALLDEF(name, n) { #name, (DL_FUNC)&name, n }
+
 // Declare FORTRAN routine for use in C
 extern void F77_NAME(ucminf)(int*, double[], double*, double[],
 			     int*,double[],int*,int*,int*,double[],SEXP);
@@ -111,10 +113,23 @@ void F77_SUB(prline)(double *a, double sl[]) {
 	    *a, sl[0], sl[1]);
 }
 
-void F77_SUB(prconv)() {
+void F77_SUB(prconv)(void) {
     Rprintf(" Optimization has converged\n");
 }
 
 void F77_SUB(prfail)(int *neval) {
     Rprintf(" Optimization stopped after %d function evaluations\n", *neval);
+}
+
+static const R_CallMethodDef CallEntries[] = {
+    CALLDEF(mfopt, 1),
+    {NULL, NULL, 0}};
+
+static const R_FortranMethodDef FortranEntries[] = {
+    {"ucminf", (DL_FUNC)&F77_NAME(ucminf), 11},
+    {NULL, NULL, 0}};
+
+void R_init_ucminf(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, FortranEntries, NULL);
+    R_useDynamicSymbols(dll, FALSE);
 }
