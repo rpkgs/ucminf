@@ -275,7 +275,83 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#  Find minimum and show trace</span></span></span>
 <span class="r-in"><span><span class="fu">ucminf</span><span class="op">(</span>par <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">.5</span><span class="op">)</span>, fn <span class="op">=</span> <span class="va">fR</span>, gr <span class="op">=</span> <span class="va">gR</span>, control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>trace <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in .Call(mfopt, rho):</span> NULL value passed as symbol address</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  neval =   1, F(x) = 1.2260e+03, max|g(x)| = 2.8020e+03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  x = 2.0000e+00, 5.0000e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Line search: alpha = 1.0000e+00, dphi(0) =-2.8881e+03, dphi(1) =-1.4263e+02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  neval =   2, F(x) = 1.0123e+01, max|g(x)| = 1.3111e+02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  x = 1.0298e+00, 7.4237e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Line search: alpha = 1.0000e+00, dphi(0) =-3.1743e+01, dphi(1) = 1.0180e+01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  neval =   3, F(x) = 1.7049e+00, max|g(x)| = 6.3969e+01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  x = 1.2600e+00, 1.7155e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Line search: alpha = 1.0000e+00, dphi(0) =-2.5788e+00, dphi(1) =-5.6182e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  neval =   4, F(x) = 1.1612e-01, max|g(x)| = 1.2343e+01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  x = 1.2174e+00, 1.5083e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Line search: alpha = 1.0000e+00, dphi(0) =-1.5867e-01, dphi(1) = 1.2108e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  neval =   5, F(x) = 4.2253e-02, max|g(x)| = 1.8638e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  x = 1.2033e+00, 1.4449e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Line search: alpha = 1.0000e+00, dphi(0) =-1.1826e-03, dphi(1) =-3.2371e-04</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  neval =   6, F(x) = 4.1500e-02, max|g(x)| = 8.6681e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  x = 1.2035e+00, 1.4474e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Line search: alpha = 1.0000e+00, dphi(0) =-5.9673e-04, dphi(1) =-4.7194e-04</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  neval =   7, F(x) = 4.0965e-02, max|g(x)| = 4.8839e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  x = 1.2024e+00, 1.4456e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Line search: alpha = 1.0000e+00, dphi(0) =-3.9731e-03, dphi(1) =-2.3018e-03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  neval =   8, F(x) = 3.7853e-02, max|g(x)| = 8.5215e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  x = 1.1928e+00, 1.4254e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Line search: alpha = 1.0000e+00, dphi(0) =-8.0453e-03, dphi(1) =-6.3954e-03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  neval =   9, F(x) = 3.0800e-02, max|g(x)| = 2.0990e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  x = 1.1676e+00, 1.3685e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Line search: alpha = 8.2084e-01, dphi(0) =-4.4175e-02, dphi(1) = 1.8746e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  neval =  11, F(x) = 4.8486e-03, max|g(x)| = 2.2862e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  x = 1.0458e+00, 1.0884e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Line search: alpha = 3.8293e-01, dphi(0) =-4.8734e-03, dphi(1) = 4.6817e-04</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  neval =  13, F(x) = 4.0485e-03, max|g(x)| = 1.1863e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  x = 1.0584e+00, 1.1177e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Line search: alpha = 1.0000e+00, dphi(0) =-6.4354e-04, dphi(1) =-5.6879e-04</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  neval =  14, F(x) = 3.4426e-03, max|g(x)| = 1.1238e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  x = 1.0535e+00, 1.1074e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Line search: alpha = 1.0000e+00, dphi(0) =-4.7371e-03, dphi(1) =-1.0920e-03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  neval =  15, F(x) = 6.1678e-04, max|g(x)| = 7.3075e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  x = 1.0180e+00, 1.0347e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Line search: alpha = 1.0000e+00, dphi(0) =-7.9043e-04, dphi(1) =-2.5377e-04</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  neval =  16, F(x) = 1.0437e-04, max|g(x)| = 1.6394e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  x = 1.0096e+00, 1.0189e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Line search: alpha = 1.0000e+00, dphi(0) =-1.8089e-04, dphi(1) =-1.8237e-05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  neval =  17, F(x) = 5.8219e-06, max|g(x)| = 9.1455e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  x = 1.0009e+00, 1.0016e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Line search: alpha = 1.0000e+00, dphi(0) =-1.3102e-05, dphi(1) = 2.0222e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  neval =  18, F(x) = 2.9162e-07, max|g(x)| = 1.7185e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  x = 1.0003e+00, 1.0007e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Line search: alpha = 1.0000e+00, dphi(0) =-5.9332e-07, dphi(1) = 1.1234e-08</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  neval =  19, F(x) = 1.2578e-10, max|g(x)| = 2.0751e-04</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  x = 9.9999e-01, 9.9998e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Line search: alpha = 1.0000e+00, dphi(0) =-2.5270e-10, dphi(1) = 1.1297e-12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  neval =  20, F(x) = 3.5670e-15, max|g(x)| = 2.0836e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  x = 1.0000e+00, 1.0000e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Line search: alpha = 1.0000e+00, dphi(0) =-7.1150e-15, dphi(1) =-1.8980e-17</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Optimization has converged</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Stopped by small gradient (grtol). </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  maxgradient     laststep      stepmax        neval </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1.020598e-08 6.480989e-08 1.225000e-01 2.100000e+01 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $par</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8.073499e-20</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $convergence</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $message</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Stopped by small gradient (grtol)."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $invhessian.lt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.4975315 0.9951877 1.9956183</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $info</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  maxgradient     laststep      stepmax        neval </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1.020598e-08 6.480989e-08 1.225000e-01 2.100000e+01 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>
   </div>
